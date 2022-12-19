@@ -1,5 +1,8 @@
 #!/bin/bash
 
+pwm
+find .
+
 source ./secrets.sh
 source ./config.sh
 
