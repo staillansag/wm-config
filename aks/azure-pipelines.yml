@@ -42,45 +42,45 @@ steps:
   displayName: "Grant shell execution permissions"
 
 - script: |
-    ./00-az-login.sh
+    ./aks/00-az-login.sh
   displayName: 'Login to Azure with service principal'
 
 - script: |
-    ./01-create_rg.sh
+    ./aks/01-create_rg.sh
   displayName: 'Create resource group for AKS cluster'
 
 - script: |
-    ./02-create_cluster.sh
+    ./aks/02-create_cluster.sh
   displayName: 'Create AKS cluster'
 
 - script: |
-    ./03-create_kubeconfig.sh
+    ./aks/03-create_kubeconfig.sh
   displayName: 'Create kubeconfig for kubectl'
 
 - script: |
-    ./04-create_sagacr_secret.sh
+    ./aks/04-create_sagacr_secret.sh
   displayName: 'Create secret to connect to SAG ACR'
 
 - script: |
-    ./05-create_myacr_secret.sh
+    ./aks/05-create_myacr_secret.sh
   displayName: 'Create secret to connect to my ACR'
 
 - script: |
-    ./06-create_msr_license_secret.sh
+    ./aks/06-create_msr_license_secret.sh
   displayName: 'Create secret for the MSR license'
 
 - script: |
-    ./07-create_env_secret.sh
+    ./aks/07-create_env_secret.sh
   displayName: 'Create secret for the environment aspects'
 
 - script: |
-    ./08-create_env_configmap.sh
+    ./aks/08-create_env_configmap.sh
   displayName: 'Create config map for the environment aspects'
 
 - script: |
-    ./09-create_ssl_secret.sh
+    ./aks/09-create_ssl_secret.sh
   displayName: 'Create secret for the TLS certificate'
 
 - script: |
-    ./10-install_ingress.sh
+    ./aks/10-install_ingress.sh
   displayName: 'Create secret for the TLS certificate'
