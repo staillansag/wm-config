@@ -35,8 +35,8 @@ steps:
     secureFile: 'msr-license.xml'
 
 - script: |
-    sudo apt update
-    sudo apt install unzip -y
+    apt update
+    apt install unzip -y
   displayName: 'Install unzip'
 
 - task: HelmInstaller@0
