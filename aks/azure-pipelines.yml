@@ -42,8 +42,9 @@ steps:
   displayName: "Grant shell execution permissions"
 
 - script: |
-    ./aks/00-az-login.sh
+    ./00-az-login.sh
   displayName: 'Login to Azure with service principal'
+  workingDirectory: ./aks
 
 - script: |
     ./aks/01-create_rg.sh
