@@ -47,41 +47,51 @@ steps:
   workingDirectory: ./aks
 
 - script: |
-    ./aks/01-create_rg.sh
+    ./01-create_rg.sh
   displayName: 'Create resource group for AKS cluster'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/02-create_cluster.sh
+    ./02-create_cluster.sh
   displayName: 'Create AKS cluster'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/03-create_kubeconfig.sh
+    ./03-create_kubeconfig.sh
   displayName: 'Create kubeconfig for kubectl'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/04-create_sagacr_secret.sh
+    ./04-create_sagacr_secret.sh
   displayName: 'Create secret to connect to SAG ACR'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/05-create_myacr_secret.sh
+    ./05-create_myacr_secret.sh
   displayName: 'Create secret to connect to my ACR'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/06-create_msr_license_secret.sh
+    ./06-create_msr_license_secret.sh
   displayName: 'Create secret for the MSR license'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/07-create_env_secret.sh
+    ./07-create_env_secret.sh
   displayName: 'Create secret for the environment aspects'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/08-create_env_configmap.sh
+    ./08-create_env_configmap.sh
   displayName: 'Create config map for the environment aspects'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/09-create_ssl_secret.sh
+    ./09-create_ssl_secret.sh
   displayName: 'Create secret for the TLS certificate'
+  workingDirectory: ./aks
 
 - script: |
-    ./aks/10-install_ingress.sh
+    ./10-install_ingress.sh
   displayName: 'Create secret for the TLS certificate'
+  workingDirectory: ./aks
