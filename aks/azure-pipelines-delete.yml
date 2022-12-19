@@ -1,0 +1,33 @@
+# This pipeline is only meant to be executed manually
+trigger: none
+
+pool:
+  name: Default
+
+variables:
+  - group: aks.variables
+
+steps:
+
+- task: DownloadSecureFile@1
+  name: EnvironmentSecrets
+  displayName: 'Download environment secrets'
+  inputs:
+    secureFile: 'secrets.sh'
+
+- script: |
+    cp $ENVIRONMENTSECRETS_SECUREFILEPATH ./aks
+  displayName: 'Copy secrets.sh into aks folder'    
+
+- script: chmod u+x ./aks/*.sh
+  displayName: "Grant shell execution permissions"
+
+- script: |
+    ./00-az-login.sh
+  displayName: 'Login to Azure with service principal'
+  workingDirectory: ./aks
+
+- script: |
+    ./99-delete_rg.sh
+  displayName: 'Delete resource group'
+  workingDirectory: ./aks
