@@ -91,6 +91,11 @@ steps:
   displayName: 'Create secret for the TLS certificate'
   workingDirectory: ./aks
 
+- task: HelmInstaller@0
+  inputs:
+    helmVersion: '2.14.1'
+    installKubectl: false
+
 - script: |
     ./10-install_ingress.sh
   displayName: 'Create secret for the TLS certificate'
