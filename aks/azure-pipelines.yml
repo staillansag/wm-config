@@ -1,0 +1,86 @@
+# This pipeline is only meant to be executed manually
+trigger: none
+
+pool:
+  name: Default
+
+variables:
+  - group: aks.variables
+
+steps:
+
+- task: DownloadSecureFile@1
+  name: EnvironmentSecrets
+  displayName: 'Download environment secrets'
+  inputs:
+    secureFile: 'secrets.sh'
+
+- task: DownloadSecureFile@1
+  name: TLSPrivateKey
+  displayName: 'Download TLS certificate private key'
+  inputs:
+    secureFile: 'sttlab.eu.key'
+
+# Not really a secret, managed as a secret for convenience
+- task: DownloadSecureFile@1
+  name: TLSPublicKey
+  displayName: 'Download TLS certificate public key'
+  inputs:
+    secureFile: 'sttlab.eu.crt'
+
+- task: DownloadSecureFile@1
+  name: MSRLicense
+  displayName: 'Download MSR License'
+  inputs:
+    secureFile: 'msr-license.xml'
+
+- script: |
+    cp $ENVIRONMENTSECRETS_SECUREFILEPATH ./aks
+  displayName: 'Copy secrets.sh into aks folder'    
+
+- script: chmod u+x ./aks/*.sh
+  displayName: "Grant shell execution permissions"
+
+- script: |
+    ./00-az-login.sh
+  displayName: 'Login to Azure with service principal'
+
+- script: |
+    ./01-create_rg.sh
+  displayName: 'Create resource group for AKS cluster'
+
+- script: |
+    ./02-create_cluster.sh
+  displayName: 'Create AKS cluster'
+
+- script: |
+    ./03-create_kubeconfig.sh
+  displayName: 'Create kubeconfig for kubectl'
+
+- script: |
+    ./04-create_sagacr_secret.sh
+  displayName: 'Create secret to connect to SAG ACR'
+
+- script: |
+    ./05-create_myacr_secret.sh
+  displayName: 'Create secret to connect to my ACR'
+
+- script: |
+    ./06-create_msr_license_secret.sh
+  displayName: 'Create secret for the MSR license'
+
+- script: |
+    ./07-create_env_secret.sh
+  displayName: 'Create secret for the environment aspects'
+
+- script: |
+    ./08-create_env_configmap.sh
+  displayName: 'Create config map for the environment aspects'
+
+- script: |
+    ./09-create_ssl_secret.sh
+  displayName: 'Create secret for the TLS certificate'
+
+- script: |
+    ./10-install_ingress.sh
+  displayName: 'Create secret for the TLS certificate'
