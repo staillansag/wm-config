@@ -13,11 +13,11 @@ steps:
   name: EnvironmentSecrets
   displayName: 'Download environment secrets'
   inputs:
-    secureFile: 'secrets.sh'
+    secureFile: 'secrets_aks.sh'
 
 - script: |
     cp $ENVIRONMENTSECRETS_SECUREFILEPATH ./aks
-  displayName: 'Copy secrets.sh into aks folder'    
+  displayName: 'Copy secrets_aks.sh into aks folder'    
 
 - script: chmod u+x ./aks/*.sh
   displayName: "Grant shell execution permissions"
