@@ -1,11 +1,10 @@
 #!/bin/bash
 
-source ./secrets.sh
-source ./config.sh
+source ./secrets_aks.sh
+source ./config_aks.sh
 
 echo "Deleting resource group ${RESOURCE_GROUP}"
 
 az group delete \
 --name ${RESOURCE_GROUP} \
---yes
-
+--yes  || exit 1

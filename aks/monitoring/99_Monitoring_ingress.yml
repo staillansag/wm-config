@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monitoring-ingress
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  # Use the host you used in your kubernetes Ingress Configurations
+  - host: "prometheus.sttlab.eu"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: prometheus-service
+            port: 
+              number: 8080
+  - host: "grafana.sttlab.eu"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: grafana
+            port: 
+              number: 3000
+  tls:
+  - hosts: 
+    - prometheus.sttlab.eu
+    secretName: aks-tls
+  - hosts: 
+    - grafana.sttlab.eu
+    secretName: aks-tls

@@ -13,20 +13,20 @@ steps:
   name: EnvironmentSecrets
   displayName: 'Download environment secrets'
   inputs:
-    secureFile: 'secrets.sh'
+    secureFile: 'secrets_aks.sh'
 
 - task: DownloadSecureFile@1
   name: TLSPrivateKey
   displayName: 'Download TLS certificate private key'
   inputs:
-    secureFile: 'sttlab.eu.key'
+    secureFile: 'cert.key'
 
 # Not really a secret, managed as a secret for convenience
 - task: DownloadSecureFile@1
   name: TLSPublicKey
   displayName: 'Download TLS certificate public key'
   inputs:
-    secureFile: 'sttlab.eu.crt'
+    secureFile: 'cert.crt'
 
 - task: DownloadSecureFile@1
   name: MSRLicense
@@ -84,12 +84,12 @@ steps:
 
 - script: |
     ./07-create_env_secret.sh
-  displayName: 'Create secret for the environment aspects'
+  displayName: 'Create global secrets'
   workingDirectory: ./aks
 
 - script: |
     ./08-create_env_configmap.sh
-  displayName: 'Create config map for the environment aspects'
+  displayName: 'Create global config map'
   workingDirectory: ./aks
 
 - script: |
@@ -99,5 +99,10 @@ steps:
 
 - script: |
     ./10-install_ingress.sh
-  displayName: 'Create secret for the TLS certificate'
+  displayName: 'Installing ingress controller'
+  workingDirectory: ./aks
+
+- script: |
+    ./11-install_prometheus-grafana.sh
+  displayName: 'Installing Prometheus, Grafana and FluentD'
   workingDirectory: ./aks

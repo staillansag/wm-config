@@ -1,7 +1,7 @@
 #!/bin/bash
 
-source ./secrets.sh
-source ./config.sh
+source ./secrets_aks.sh
+source ./config_aks.sh
 
 echo "Creating Ingress controller"
 
@@ -15,4 +15,4 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
   --create-namespace \
   --namespace $NAMESPACE \
   --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz \
-  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"=${DNS_LABEL_NAME}
+  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"=${DNS_LABEL_NAME}  || exit 1
