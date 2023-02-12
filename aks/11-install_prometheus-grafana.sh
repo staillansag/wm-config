@@ -15,6 +15,4 @@ kubectl create -f monitoring/11_Grafana_configMap.yaml || exit 1
 kubectl create -f monitoring/12_Grafana_deployment.yaml || exit 1
 kubectl create -f monitoring/13_Grafana_service.yaml || exit 1
 
-sed 's/example\.com/'${DOMAIN_NAME}'/g' ./monitoring/99_Monitoring_ingress.yml
-
 sed 's/example\.com/'${DOMAIN_NAME}'/g' ./monitoring/99_Monitoring_ingress.yml | kubectl create -f - || exit 1

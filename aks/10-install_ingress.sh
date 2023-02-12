@@ -16,3 +16,8 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
   --namespace $NAMESPACE \
   --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz \
   --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"=${DNS_LABEL_NAME}  || exit 1
+
+kubectl wait --namespace $NAMESPACE \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s || exit 1
