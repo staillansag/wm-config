@@ -104,5 +104,10 @@ steps:
 
 - script: |
     ./11-install_prometheus-grafana.sh
-  displayName: 'Installing Prometheus, Grafana and FluentD'
+  displayName: 'Installing Prometheus and Grafana'
+  workingDirectory: ./aks
+
+- script: |
+    ./12-install_fluentD.sh
+  displayName: 'Installing FluentD'
   workingDirectory: ./aks
