@@ -1,12 +1,25 @@
-export AZ_TENANT_ID=ID of your Azure tenant
-export AZ_ACR_URL=URL of your Azure Container Registry (if you want to use one)
-export AZ_SP_ID=Azure service principal ID (this service principal is used to connect to AKS and ACR)
-export AZ_SP_SECRET=Azure service principal secret
+# ID du tenant Azure
+export AZ_TENANT_ID=
+# ID du service principal Azure
+export AZ_SP_ID=
+# Secret associé au service principal Azure
+export AZ_SP_SECRET=
 
-export SAG_DOCKER_USERNAME=ID of your SAG container registry (containers.softwareag.com) user
-export SAG_DOCKER_PASSWORD=Secret of your SAG container registry user
-export EMAIL_ADDRESS=The email address attached to your SAG container registry user
+# URL de l'Azure Container Registry
+export AZ_ACR_URL=
 
-export TLS_KEY_FILE=Path to the PEM file where your TLS certificate key is located
-export TLS_CERT_FILE=Path to the PEM file where your TLS certificate is located
-export MSR_LICENSE_FILE=Path to your MSR license XML file
+# ID de l'utilisateur de containers.softwareag.com
+export SAG_DOCKER_USERNAME=
+# Secret associé à l'utilisateur de containers.softwareag.com
+export SAG_DOCKER_PASSWORD=
+
+# Adresse email
+export EMAIL_ADDRESS=
+
+# Emplacement de la clé privée du certificat TLS (format PEM)
+export TLS_KEY_FILE=/path/to/cert.key
+# Emplacement du certificat TLS (format PEM)
+export TLS_CERT_FILE=/path/to/cert.crt
+
+# Emplacement de la license du microservice runtime
+export MSR_LICENSE_FILE=/path/to/msr-license.xml
