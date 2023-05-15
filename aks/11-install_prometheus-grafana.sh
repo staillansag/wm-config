@@ -7,6 +7,8 @@ echo "Installing Prometheus and Grafana"
 
 kubectl create -f monitoring/00_Monitoring_namespace.yaml || exit 1
 
+kubectl create secret tls aks-tls --key="${TLS_KEY_FILE}" --cert="${TLS_CERT_FILE}" -n monitoring  || exit 1
+
 kubectl create -f monitoring/01_Prometheus_clusterRole.yaml || exit 1
 kubectl create -f monitoring/02_Prometheus_configMap.yaml || exit 1
 kubectl create -f monitoring/03_Prometheus_deployment.yaml || exit 1
