@@ -94,11 +94,6 @@ steps:
   workingDirectory: ./aks
 
 - script: |
-    ./09-create_ssl_secret.sh
-  displayName: 'Create secret for the TLS certificate'
-  workingDirectory: ./aks
-
-- script: |
     ./10-install_ingress.sh
   displayName: 'Installing ingress controller'
   workingDirectory: ./aks
@@ -111,4 +106,9 @@ steps:
 - script: |
     ./12-install_fluentD.sh
   displayName: 'Installing FluentD'
+  workingDirectory: ./aks
+
+- script: |
+    ./13-create_ssl_secret.sh
+  displayName: 'Create secret for the TLS certificate'
   workingDirectory: ./aks
