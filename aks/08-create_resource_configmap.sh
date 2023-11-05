@@ -1,8 +1,5 @@
 #!/bin/bash
 
-source ./secrets_aks.sh
-source ./config_aks.sh
-
 echo "Creating global Kubernetes config map"
 kubectl create configmap global-config \
 	 --from-literal=elasticUrl=${FLUENT_ELASTICSEARCH_HOST} \

@@ -6,15 +6,10 @@ pool:
 
 variables:
   - group: aks.variables
-  - group: customer-management-options
+  - group: azure.variables
+  - group: sag.variables
 
 steps:
-
-- task: DownloadSecureFile@1
-  name: EnvironmentSecrets
-  displayName: 'Download environment secrets'
-  inputs:
-    secureFile: 'secrets_aks.sh'
 
 - task: DownloadSecureFile@1
   name: TLSPrivateKey
@@ -35,15 +30,21 @@ steps:
   inputs:
     secureFile: 'msr-license.xml'
 
+- task: DownloadSecureFile@1
+  name: UMLicense
+  displayName: 'Download MSR License'
+  inputs:
+    secureFile: 'um-license.xml'
+
 - script: |
     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
     chmod 700 get_helm.sh
     ./get_helm.sh
   displayName: 'Install helm'
 
-- script: |
-    cp $ENVIRONMENTSECRETS_SECUREFILEPATH ./aks
-  displayName: 'Copy secrets.sh into aks folder'    
+# - script: |
+#     cp $ENVIRONMENTSECRETS_SECUREFILEPATH ./aks
+#   displayName: 'Copy secrets.sh into aks folder'    
 
 - script: chmod u+x ./aks/*.sh
   displayName: "Grant shell execution permissions"
@@ -52,6 +53,8 @@ steps:
     ./00-az-login.sh
   displayName: 'Login to Azure with service principal'
   workingDirectory: ./aks
+  env:
+    AZ_SP_SECRET: $(AZ_SP_SECRET)
 
 - script: |
     ./01-create_rg.sh
@@ -72,25 +75,31 @@ steps:
     ./04-create_sagacr_secret.sh
   displayName: 'Create secret to connect to SAG ACR'
   workingDirectory: ./aks
+  env:
+    SAG_ACR_PASSWORD: $(SAG_ACR_PASSWORD)
 
 - script: |
-    ./05-create_myacr_secret.sh
-  displayName: 'Create secret to connect to my ACR'
+    export MSR_LICENSE_FILE_PATH=$(MSRLicense.secureFilePath)
+    export UM_LICENSE_FILE_PATH=$(UMLicense.secureFilePath)
+    ./06-create_product_license_secrets.sh
+  displayName: 'Create secrets for the SAG product licenses'
   workingDirectory: ./aks
 
-- script: |
-    ./06-create_msr_license_secret.sh
-  displayName: 'Create secret for the MSR license'
-  workingDirectory: ./aks
+# - script: |
+#     ./07-create_resource_secret.sh
+#   displayName: 'Create resource secrets'
+#   workingDirectory: ./aks
+
+# - script: |
+#     ./08-create_resource_configmap.sh
+#   displayName: 'Create resource config map'
+#   workingDirectory: ./aks
 
 - script: |
-    ./07-create_env_secret.sh
-  displayName: 'Create global secrets'
-  workingDirectory: ./aks
-
-- script: |
-    ./08-create_env_configmap.sh
-  displayName: 'Create global config map'
+    export TLS_PUBLICKEY_FILE_PATH=$(TLSPublicKey.secureFilePath)
+    export TLS_PRIVATEKEY_FILE_PATH=$(TLSPrivateKey.secureFilePath)
+    ./09-create_ssl_secret.sh
+  displayName: 'Create secret for the TLS certificate'
   workingDirectory: ./aks
 
 - script: |
@@ -99,16 +108,13 @@ steps:
   workingDirectory: ./aks
 
 - script: |
+    export TLS_PUBLICKEY_FILE_PATH=$(TLSPublicKey.secureFilePath)
+    export TLS_PRIVATEKEY_FILE_PATH=$(TLSPrivateKey.secureFilePath)
     ./11-install_prometheus-grafana.sh
   displayName: 'Installing Prometheus and Grafana'
   workingDirectory: ./aks
 
-- script: |
-    ./12-install_fluentD.sh
-  displayName: 'Installing FluentD'
-  workingDirectory: ./aks
-
-- script: |
-    ./13-create_ssl_secret.sh
-  displayName: 'Create secret for the TLS certificate'
-  workingDirectory: ./aks
+# - script: |
+#     ./12-install_fluentD.sh
+#   displayName: 'Installing FluentD'
+#   workingDirectory: ./aks

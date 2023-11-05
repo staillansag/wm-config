@@ -1,8 +1,5 @@
 #!/bin/bash
 
-source ./config_aks.sh
-source ./secrets_aks.sh
-
-echo "Creating resource group ${RESOURCE_GROUP} in region ${LOCATION}"
-az group create --location ${LOCATION} \
-	--name ${RESOURCE_GROUP}  || exit 1
+echo "Creating resource group ${AKS_RESOURCE_GROUP} in region ${AZ_LOCATION}"
+az group create --location ${AZ_LOCATION} \
+	--name ${AKS_RESOURCE_GROUP}  || exit 1

@@ -1,7 +1,4 @@
 #!/bin/bash
 
-source ./config_aks.sh
-source ./secrets_aks.sh
-
-echo "Retrieving kubeconfig file for cluster ${CLUSTER_NAME}"
-az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER_NAME} --overwrite-existing  || exit 1
+echo "Retrieving kubeconfig file for cluster ${AKS_CLUSTER_NAME}"
+az aks get-credentials --resource-group ${AKS_RESOURCE_GROUP} --name ${AKS_CLUSTER_NAME} --overwrite-existing  || exit 1
