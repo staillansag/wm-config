@@ -20,24 +20,27 @@ kubectl wait --namespace ingress-basic \
 max_attempts=60
 interval=5
 ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+found_ip=false
 
 for ((i=1; i<=max_attempts; i++)); do
     ip=$(kubectl get svc ingress-nginx-controller -n ingress-basic -o json | jq -r '.status.loadBalancer.ingress[0].ip')
 
     if [[ $ip =~ $ip_regex ]]; then
         echo "IP address $ip has been allocated."
+        found_ip=true
+        break
     else
         echo "Waiting for IP address allocation... (Attempt $i/$max_attempts)"
         sleep $interval
     fi
-    if [ $i -eq $max_attempts ]; then
-        echo "Timed out waiting for IP address allocation."
-        exit 1
-    fi
 done
 
-echo "Updating DNS record ${AKS_CLUSTER_NAME}.sttlab.eu with A record pointing to ${ingressIp}"
+if [ "$found_ip" = false ]; then
+    echo "Timed out waiting for IP address allocation." && exit 1
+fi
+
+echo "Updating DNS record ${AKS_CLUSTER_NAME}.sttlab.eu with A record pointing to ${ip}"
 curl -X PUT -H "Content-Type: application/json" \
      -H "Authorization: Bearer ${GANDI_PAT_TOKEN}" \
-     -d '{"rrset_name": "${AKS_CLUSTER_NAME}","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["${ingressIp}"]}' \
+     -d '{"rrset_name": "${AKS_CLUSTER_NAME}","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["${ip}"]}' \
      https://api.gandi.net/v5/livedns/domains/sttlab.eu/records/${AKS_CLUSTER_NAME}/A || exit 1
