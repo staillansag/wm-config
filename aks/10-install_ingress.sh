@@ -40,7 +40,9 @@ if [ "$found_ip" = false ]; then
 fi
 
 echo "Updating DNS record ${AKS_CLUSTER_NAME}.sttlab.eu with A record pointing to ${ip}"
-curl -X PUT -H "Content-Type: application/json" \
+echo "Gandi URL: https://api.gandi.net/v5/livedns/domains/sttlab.eu/records/${AKS_CLUSTER_NAME}/A"
+echo "Gandi payload: " '{"rrset_name": "'${AKS_CLUSTER_NAME}'","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["'${ip}'"]}'
+curl -s -X PUT -H "Content-Type: application/json" \
      -H "Authorization: Bearer ${GANDI_PAT_TOKEN}" \
-     -d '{"rrset_name": "${AKS_CLUSTER_NAME}","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["${ip}"]}' \
+     -d '{"rrset_name": "'${AKS_CLUSTER_NAME}'","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["'${ip}'"]}' \
      https://api.gandi.net/v5/livedns/domains/sttlab.eu/records/${AKS_CLUSTER_NAME}/A || exit 1
