@@ -17,8 +17,24 @@ kubectl wait --namespace ingress-basic \
   --selector=app.kubernetes.io/component=controller \
   --timeout=300s || exit 1
 
-ingressIp=$(kubectl get svc ingress-nginx-controller -n ingress-basic -o json | jq -r '.status.loadBalancer.ingress[0].ip')
-echo "Ingress IP: ${ingressIp}"
+max_attempts=60
+interval=5
+ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+
+for ((i=1; i<=max_attempts; i++)); do
+    ip=$(kubectl get svc ingress-nginx-controller -n ingress-basic -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+
+    if [[ $ip =~ $ip_regex ]]; then
+        echo "IP address $ip has been allocated."
+    else
+        echo "Waiting for IP address allocation... (Attempt $i/$max_attempts)"
+        sleep $interval
+    fi
+    if [ $i -eq $max_attempts ]; then
+        echo "Timed out waiting for IP address allocation."
+        exit 1
+    fi
+done
 
 echo "Updating DNS record ${AKS_CLUSTER_NAME}.sttlab.eu with A record pointing to ${ingressIp}"
 curl -X PUT -H "Content-Type: application/json" \
