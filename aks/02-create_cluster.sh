@@ -7,9 +7,7 @@ echo "Load balancer SKU: ${AKS_LOAD_BALANCER_SKU}"
 az aks create \
 	-g ${AKS_RESOURCE_GROUP} \
 	-n ${AKS_CLUSTER_NAME} \
-	--enable-managed-identity \
 	--node-count ${AKS_NODE_COUNT} \
-	--enable-addons monitoring \
 	--generate-ssh-keys \
 	--node-vm-size ${AKS_VM_SIZE} \
 	--load-balancer-sku ${AKS_LOAD_BALANCER_SKU}  || exit 1
