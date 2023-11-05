@@ -106,6 +106,8 @@ steps:
     ./10-install_ingress.sh
   displayName: 'Installing ingress controller'
   workingDirectory: ./aks
+  env:
+    GANDI_PAT_TOKEN: $(GANDI_PAT_TOKEN)
 
 - script: |
     export TLS_PUBLICKEY_FILE_PATH=$(TLSPublicKey.secureFilePath)
