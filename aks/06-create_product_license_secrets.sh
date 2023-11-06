@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -f "$(MSR_LICENSE_FILE_PATH)" && -f "$(UM_LICENSE_FILE_PATH)" ]; then
+if [[ -f $MSR_LICENSE_FILE_PATH && -f $UM_LICENSE_FILE_PATH ]]; then
     echo "Creating Kubernetes secret for the product licenses"
     kubectl create secret generic licenses \
         --from-file=msr-license=${MSR_LICENSE_FILE_PATH} \

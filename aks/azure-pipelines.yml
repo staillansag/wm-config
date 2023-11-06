@@ -8,6 +8,7 @@ variables:
   - group: aks.variables
   - group: azure.variables
   - group: sag.variables
+  - group: environment.variables
 
 steps:
 
@@ -85,15 +86,21 @@ steps:
   displayName: 'Create secrets for the SAG product licenses'
   workingDirectory: ./aks
 
-# - script: |
-#     ./07-create_resource_secret.sh
-#   displayName: 'Create resource secrets'
-#   workingDirectory: ./aks
+- script: |
+    ./07-create_environment_secret.sh
+  displayName: 'Create environment secret'
+  workingDirectory: ./aks
+  env:
+    SAG_MSR_ADMIN_PASSWORD: $(SAG_MSR_ADMIN_PASSWORD)
+    RDS_PASSWORD: $(RDS_PASSWORD)
+    S3_ACCESS_KEY: $(S3_ACCESS_KEY)
+    S3_ACCESS_SECRET: $(S3_ACCESS_SECRET)
+    SFTP_PASSWORD: $(SFTP_PASSWORD)
 
-# - script: |
-#     ./08-create_resource_configmap.sh
-#   displayName: 'Create resource config map'
-#   workingDirectory: ./aks
+- script: |
+    ./08-create_environment_configmap.sh
+  displayName: 'Create environment config map'
+  workingDirectory: ./aks
 
 - script: |
     export TLS_PUBLICKEY_FILE_PATH=$(TLSPublicKey.secureFilePath)
