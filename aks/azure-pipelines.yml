@@ -120,3 +120,8 @@ steps:
 #     ./12-install_fluentD.sh
 #   displayName: 'Installing FluentD'
 #   workingDirectory: ./aks
+
+- script: |
+    ./13-install_um.sh
+  displayName: 'Installing Universal Messaging'
+  workingDirectory: ./aks
