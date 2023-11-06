@@ -8,8 +8,11 @@ kubectl create configmap global-config \
 	--from-literal=RDS_USER_NAME=${RDS_USER_NAME} \
 	--from-literal=S3_BUCKET_NAME=${S3_BUCKET_NAME} \
 	--from-literal=S3_FOLDER=${S3_FOLDER} \
+	--from-literal=S3_REGION=${S3_REGION} \
 	--from-literal=S3_URL=${S3_URL} \
 	--from-literal=SFTP_SERVER_NAME=${SFTP_SERVER_NAME} \
 	--from-literal=SFTP_PORT=${SFTP_PORT} \
 	--from-literal=SFTP_FOLDER=${SFTP_FOLDER} \
-	--from-literal=SFTP_USER_NAME=${SFTP_USER_NAME} || exit 1
+	--from-literal=SFTP_USER_NAME=${SFTP_USER_NAME} \
+	--from-literal=SFTP_SERVER_HOST_KEY=${SFTP_SERVER_HOST_KEY} \
+	--from-literal=MSR_TEMP_DIR=${MSR_TEMP_DIR} || exit 1
