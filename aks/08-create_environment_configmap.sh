@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Creating global Kubernetes config map"
-kubectl create configmap global-config \
+kubectl create configmap environment-config \
 	--from-literal=RDS_DATABASE_NAME=${RDS_DATABASE_NAME} \
 	--from-literal=RDS_SERVER_NAME=${RDS_SERVER_NAME} \
 	--from-literal=RDS_PORT=${RDS_PORT} \

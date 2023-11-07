@@ -43,10 +43,6 @@ steps:
     ./get_helm.sh
   displayName: 'Install helm'
 
-# - script: |
-#     cp $ENVIRONMENTSECRETS_SECUREFILEPATH ./aks
-#   displayName: 'Copy secrets.sh into aks folder'    
-
 - script: chmod u+x ./aks/*.sh
   displayName: "Grant shell execution permissions"
 
@@ -122,11 +118,6 @@ steps:
     ./11-install_prometheus-grafana.sh
   displayName: 'Installing Prometheus and Grafana'
   workingDirectory: ./aks
-
-# - script: |
-#     ./12-install_fluentD.sh
-#   displayName: 'Installing FluentD'
-#   workingDirectory: ./aks
 
 - script: |
     ./13-install_um.sh
