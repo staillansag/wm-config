@@ -37,6 +37,12 @@ steps:
   inputs:
     secureFile: 'um-license.xml'
 
+- task: DownloadSecureFile@1
+  name: MCGWLicense
+  displayName: 'Download Microgateway License'
+  inputs:
+    secureFile: 'mcgw-license.xml'
+
 - script: |
     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
     chmod 700 get_helm.sh
@@ -78,6 +84,7 @@ steps:
 - script: |
     export MSR_LICENSE_FILE_PATH=$(MSRLicense.secureFilePath)
     export UM_LICENSE_FILE_PATH=$(UMLicense.secureFilePath)
+    export MCGW_LICENSE_FILE_PATH=$(MCGWLicense.secureFilePath)
     ./06-create_product_license_secrets.sh
   displayName: 'Create secrets for the SAG product licenses'
   workingDirectory: ./aks
