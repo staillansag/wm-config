@@ -12,5 +12,7 @@ kubectl create secret generic environment-secret \
 	--from-literal=DB_PASSWORD=${RDS_PASSWORD} \
 	--from-literal=S3_ACCESS_KEY=${S3_ACCESS_KEY} \
 	--from-literal=S3_SECRET_KEY=${S3_ACCESS_SECRET} \
-	--from-literal=SFTP_USER_PASSWORD=${SFTP_PASSWORD} || exit 1
+	--from-literal=SFTP_USER_PASSWORD=${SFTP_PASSWORD} \
+	--from-literal=API_GATEWAY_USERNAME=${API_GATEWAY_USERNAME} \
+	--from-literal=API_GATEWAY_PASSWORD=${API_GATEWAY_PASSWORD} || exit 1
 

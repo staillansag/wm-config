@@ -15,4 +15,5 @@ kubectl create configmap environment-config \
 	--from-literal=SFTP_FOLDER=${SFTP_FOLDER} \
 	--from-literal=SFTP_USER_NAME=${SFTP_USER_NAME} \
 	--from-literal=SFTP_SERVER_HOST_KEY=${SFTP_SERVER_HOST_KEY} \
-	--from-literal=MSR_TEMP_DIR=${MSR_TEMP_DIR} || exit 1
+	--from-literal=MSR_TEMP_DIR=${MSR_TEMP_DIR} \
+	--from-literal=API_GATEWAY_URL=${API_GATEWAY_URL} || exit 1

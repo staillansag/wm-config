@@ -92,6 +92,7 @@ steps:
     S3_ACCESS_KEY: $(S3_ACCESS_KEY)
     S3_ACCESS_SECRET: $(S3_ACCESS_SECRET)
     SFTP_PASSWORD: $(SFTP_PASSWORD)
+    API_GATEWAY_PASSWORD: $(API_GATEWAY_PASSWORD)
 
 - script: |
     ./08-create_environment_configmap.sh
