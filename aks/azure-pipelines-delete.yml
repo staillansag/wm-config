@@ -6,18 +6,9 @@ pool:
 
 variables:
   - group: aks.variables
+  - group: azure.variables
 
 steps:
-
-- task: DownloadSecureFile@1
-  name: EnvironmentSecrets
-  displayName: 'Download environment secrets'
-  inputs:
-    secureFile: 'secrets_aks.sh'
-
-- script: |
-    cp $ENVIRONMENTSECRETS_SECUREFILEPATH ./aks
-  displayName: 'Copy secrets_aks.sh into aks folder'    
 
 - script: chmod u+x ./aks/*.sh
   displayName: "Grant shell execution permissions"
@@ -26,6 +17,8 @@ steps:
     ./00-az-login.sh
   displayName: 'Login to Azure with service principal'
   workingDirectory: ./aks
+  env:
+    AZ_SP_SECRET: $(AZ_SP_SECRET)
 
 - script: |
     ./99-delete_rg.sh
