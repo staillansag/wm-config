@@ -17,8 +17,8 @@ Ce service principal doit avoir les habilitations nécessaires pour gérer les r
 Voir cette page: https://learn.microsoft.com/fr-fr/azure/active-directory/develop/howto-create-service-principal-portal (utilisez l'option 2 pour l'authentification.)
 
 Niveau configuration vous aurez besoin de:
--   l'ID de votre tenant Azure, à positionner dans AZ_TENANT_ID
--   l'ID de votre service principal et son secret (chaîne de caractères longue faisant office de mot de passe), à positionner dans AZ_SP_ID et AZ_SP_SECRET
+-   l'ID de votre tenant Azure
+-   l'ID de votre service principal et son secret (chaîne de caractères longue faisant office de mot de passe)
 
 ### Organisation Azure Pipelines
 
@@ -39,7 +39,18 @@ install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 apt install -y nodejs
 apt install -y npm
 npm install -g newman
+apt install -y unzip
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip -u awscliv2.zip
+sudo ./aws/install
+apt install -y openssh-client
+apt install -y sshpass
 ```
+
+nodejs et npm sont des pré-requis pour newman, qui permet d'exécuter des collections Postman en ligne de commande (tests d'APIs.)
+La CLI AWS est utilisées dans certains steps de tests, où je vérifie la présencé de fichiers dans un bucket S3.
+Le client ssh est lui utilisé dans les mêmes steps de test pour vérifier la présence de fichiers dans un serveur SFTP.
+
 
 ### Azure Container Registry 
 
@@ -62,128 +73,104 @@ Le pipeline se chargera alors de configurer un secret Kubernetes pour ce fichier
 ### Certificat serveur TLS
 
 Optionnel.
-Si vous avez un certificat TLS, indiquez l'emplacement de la clé privée (au format PEM) dans la variable TLS_KEY_FILE, et celui du certificat (également au format PEM) dans TLS_CERT_FILE.
+Si vous avez un nom de domaine et certificat TLS pour ce domaine, indiquez l'emplacement de la clé privée (au format PEM) dans la variable TLS_KEY_FILE, et celui du certificat (également au format PEM) dans TLS_CERT_FILE.
 Le pipeline se chargera alors de configurer un secret Kubernetes pour ce certificat, ce qui permettra de l'utiliser dans les ingress Kubernetes.
-
 
 ## Configuration
 
-Les scripts nécessitent des éléments de configuration, qui sont divisés en deux catégories :
--   tout ce qui est non confidentiel est géré dans config_aks.sh et dans la bibliothèque de variables aks.variables d'Azure Pipelines
--   tout ce qui confidentiel est géré dans secrets_aks.sh, fichier qui est positionné dans la section "fichiers sécurisés" (secure files) d'Azure Pipeline
+### Bibliothèque de variables Azure (azure.variables)
 
-### config_aks.sh
+| Name                   | Value                                                                                    |
+|------------------------|------------------------------------------------------------------------------------------|
+| AZ_LOCATION            | Code région Azure (par exemple westeurope)                                               |
+| AZ_SANDBOX_MODE        | Indique que la souscription Azure est une sandbox acloud.guru (optionel)                 |
+| AZ_SP_ID               | ID de votre service principal (c'est un uuid)                                            |
+| AZ_SP_SECRET           | Secret de votre service principal                                                        |
+| AZ_TENANT_ID           | ID de votre tenant Azure (c'est un uuid)                                                 |
 
-Le pipeline de création contient une clause qui lit le contenu de la bibliothèque aks.variables :
-```
-variables:
-  - group: aks.variables
-```
+### Bibliothèque de variables AKS (aks.variables)
 
-Le script config_aks.sh reprend ces variables, et positionne des valeurs par défaut lorsqu'elles sont manquantes :
-```
-# The resource group in which the AKS cluster is to be created
-export RESOURCE_GROUP=${RESOURCE_GROUP:-"aks_rg"} 
-# The region in which the AKS cluster is to be created                          
-export LOCATION=${LOCATION:-"westeurope"} 
-# The VM size to be used for worker nodes                                  
-export VM_SIZE=${VM_SIZE:-"Standard_B4ms"} 
-# The name of the AKS cluster                                 
-export CLUSTER_NAME=${CLUSTER_NAME:-"myaks"} 
-# The number of node in the cluster           
-export NODE_COUNT=${NODE_COUNT:-"1"}  
-# The load balancer SKU                                      
-export LOAD_BALANCER_SKU=${LOAD_BALANCER_SKU:-"basic"}  
-# The URL of the SAG container registry                    
-export SAG_DOCKER_URL=${SAG_DOCKER_URL:-"sagcr.azurecr.io"}  
-# The url of the elastic search to which FluentD can send log data               
-export FLUENT_ELASTICSEARCH_HOST=${FLUENT_ELASTICSEARCH_HOST:-"localhost"}  
-# The port of the elastic search
-export FLUENT_ELASTICSEARCH_PORT=${FLUENT_ELASTICSEARCH_PORT:-"8080"}    
-# The scheme to be use to connect to Elastic search (http or https)  
-export FLUENT_ELASTICSEARCH_SCHEME=${FLUENT_ELASTICSEARCH_SCHEME:-"http"}
-# Your domain name (used to configure ingresses)
-export DOMAIN_NAME=${DOMAIN_NAME:-"example.com"}    
-```
+| Name                   | Value                                                                                    |
+|------------------------|------------------------------------------------------------------------------------------|
+| AKS_RESOURCE_GROUP     | Nom du groupe de ressources Azure dans lequel le cluster est placé                       |
+| AKS_CLUSTER_NAME       | Nom du cluster aks                                                                       |
+| AKS_NODE_COUNT         | Nombre de worker nodes du cluster aks                                                    |
+| AKS_VM_SIZE            | Type de VM Azure pour les worker nodes du cluster aks                                    |
+| AKS_LOAD_BALANCER_SKU  | SKU du load balancer associé au contrôleur Ingress du cluster                            |
+| AKS_DOMAIN_NAME        | Nom de domaine associé au contrôleur Ingress (optionnel)                                 |
+| GANDI_PAT_TOKEN        | Token de l'api Gandi, permettant la création d'une entrée DNS pour l'ingress (optionnel) |
 
-### secrets_aks.sh
+Notes:
+- AKS_VM_SIZE et AKS_NODE_COUNT influent directement sur les coûts du cluster aks
 
-```
-# ID du tenant Azure
-export AZ_TENANT_ID=
-# ID du service principal Azure
-export AZ_SP_ID=
-# Secret associé au service principal Azure
-export AZ_SP_SECRET=
+Notes: 
+- AKS_RESOURCE_GROUP est ignoré si AZ_SANDBOX_MODE = true, dans ce cas on utilise le groupe de ressource par défaut de la sandbox.
+- GANDI_PAT_TOKEN est un peu un intrus dans cette liste de variables, il a été positionné ici pour éviter de créer une nouvelle bibliothèque de variables
 
-# URL de l'Azure Container Registry
-export AZ_ACR_URL=
+### Bibliothèque de variables SAG (sag.variables)
 
-# ID de l'utilisateur de containers.softwareag.com
-export SAG_DOCKER_USERNAME=
-# Secret associé à l'utilisateur de containers.softwareag.com
-export SAG_DOCKER_PASSWORD=
+| Name                   | Value                                                                                    |
+|------------------------|------------------------------------------------------------------------------------------|
+| SAG_ACR_URL            | URL du registre d'images SAG (devrait être une valeur fixe 'sagcr.azurecr.io')           |
+| SAG_ACR_USERNAME       | Votre username au niveau du registre d'images SAG                                        |
+| SAG_ACR_PASSWORD       | Votre mot de passe au niveau du registre d'images SAG                                    |
+| SAG_ACR_EMAIL_ADDRESS  | L'adresse email enregistrée au niveau du registre d'images SAG                           |
+| SAG_MSR_ADMIN_PASSWORD | Le mot de passe que vous souhaitez configurer pour le compte Administrator des MSR       |
 
-# Adresse email
-export EMAIL_ADDRESS=
+### Licences des produits SAG
 
-# Emplacement de la clé privée du certificat TLS (format PEM)
-export TLS_KEY_FILE=/path/to/cert.key
-# Emplacement du certificat TLS (format PEM)
-export TLS_CERT_FILE=/path/to/cert.crt
+Le pipeline de création du cluster fonctionne avec 3 fichiers secrets (secure files) ayant les noms suivants:
+- msr-license.xml: licence du MSR
+- um-license.xml: licence de l'UM
+- mcgw-license.xml: licence de la microgateway
 
-# Emplacement de la license du microservice runtime
-export MSR_LICENSE_FILE=/path/to/msr-license.xml
-```
+### Certificat TLS
+
+Si vous avez un nom de domaine et un certificat associé, il faut positionner 2 fichiers secrets avec les noms suivants:
+- cert.crt: partie publique du certificat au format pem
+- cert.key: partie privée du certificat au format pem
+
+Dans les faits, rien ne nous oblige strictement à stocker la partie publique du certificat dans un fichier privé, on le fait par commodité. 
 
 ## Les scripts
 
 ### 00-az-login.sh
 
-Ouvre une session Azure sur le tenant AZ_TENANT_ID avec le service provider dont les informations son renseignées dans AZ_SP_ID et AZ_SP_SECRET.
+Ouvre une session Azure sur le tenant AZ_TENANT_ID avec le service provider dont les informations sont renseignées dans AZ_SP_ID et AZ_SP_SECRET.
 
 ### 01-create_rg.sh
 
-Crée le resource group RESOURCE_GROUP dans la région LOCATION.
+Crée le groupe de ressources AKS_RESOURCE_GROUP dans la région AZ_LOCATION.
+Si AZ_SANDBOX_MODE = true, alors on utilise le groupe de ressources par défaut de la souscription (acloud.guru empêche la création de groupes de ressources dans ses sandboxes.)
 
 ### 02-create_cluster.sh
 
 Crée le cluster Kubernetes avec :
-- le nom spécifié dans CLUSTER_NAME
-- le resource group RESOURCE_GROUP
-- le nombre de noeuds spécifiés dans NODE_COUNT
-- des VM dont le dimensionnement est spécifié dans VM_SIZE
-- un load balancer dont le SKU est spécifié dans LOAD_BALANCER_SKU
+- le nom spécifié dans AKS_CLUSTER_NAME
+- le resource group AKS_RESOURCE_GROUP
+- le nombre de noeuds spécifiés dans AKS_NODE_COUNT
+- des VM dont le dimensionnement est spécifié dans AKS_VM_SIZE
+- un load balancer dont le SKU est spécifié dans AKS_LOAD_BALANCER_SKU
 
 ### 03-create_kubeconfig.sh
 
-Récupère les credentials kubectl pour accéder au cluster Kubernetes CLUSTER_NAME localisé dans la région LOCATION.
+Récupère les credentials kubectl pour accéder au cluster Kubernetes CLUSTER_NAME localisé dans la région AZ_LOCATION.
 
 ### 04-create_sagacr_secret.sh
 
-Vérifie si la variable SAG_DOCKER_USERNAME est positionnée, et si c'est le cas crée un secret Kubernetes en utilisant SAG_DOCKER_URL, SAG_DOCKER_USERNAME, SAG_DOCKER_PASSWORD et EMAIL_ADDRESS.
+Vérifie si la variable SAG_ACR_USERNAME est positionnée, et si c'est le cas crée un secret Kubernetes en utilisant SAG_ACR_URL, SAG_ACR_USERNAME, SAG_ACR_PASSWORD et SAG_ACR_EMAIL_ADDRESS.
 
-### 05-create_myacr_secret.sh
+### 06-create_product_license_secrets.sh
 
-Vérifie si la variable AZ_ACR_URL est positionnée, et si c'est le cas crée un secret Kubernetes en utilisant AZ_ACR_URL, AZ_SP_ID, AZ_SP_SECRET et EMAIL_ADDRESS.
-
-### 06-create_msr_license_secret.sh
-
-Vérifie si la variable MSR_LICENSE_FILE pointe vers un fichier existant, et si c'est le cas c'ée un secret Kubernetes en utilisant vers lequel MSR_LICENSE_FILE pointe.
+Vérifie si la variable MSR_LICENSE_FILE (injectée par le pipeline) pointe vers un fichier existant, et si c'est le cas c'ée un secret Kubernetes en utilisant vers lequel MSR_LICENSE_FILE pointe.
 
 ### 07-create_env_secret.sh
 
-Crée un secret Kubernetes nommé global-secrets contenant le nom de l'utilisateur et le mot de passe pour se connecté à Elastic Search, positionnés dans FLUENT_ELASTICSEARCH_USER et FLUENT_ELASTICSEARCH_PASSWORD.
-Ce secret sert à la configuration de FluentD pour le monitoring applicatif du cluster.
-
 ### 08-create_env_configmap.sh
-
-Crée une configMap Kubernetes nommée global-config contenant l'url, le port et le scheme pour se connecter à Elastic Search, positionnés dans FLUENT_ELASTICSEARCH_HOST, FLUENT_ELASTICSEARCH_PORT et FLUENT_ELASTICSEARCH_SCHEME.
-Cette configMap sert à la configuration de FluentD pour le monitoring applicatif du cluster.
 
 ### 09-create_ssl_secret.sh
 
-Vérifie si la variable TLS_KEY_FILE pointe sur un fichier existant, et si c'est le cas crée un secret Kubernetes de type TLS stockant la clé privée TLS_KEY_FILE et la partie publique du certificat TLS_CERT_FILE.
+Vérifie si la variable TLS_PUBLICKEY_FILE_PATH pointe sur un fichier existant, et si c'est le cas crée un secret Kubernetes de type TLS stockant la clé privée TLS_PRIVATEKEY_FILE_PATH et la partie publique du certificat TLS_PUBLICKEY_FILE_PATH.
 Ce secret sert ensuite à la configuration des ingress Kubernetes.
 
 ### 10-install_ingress.sh

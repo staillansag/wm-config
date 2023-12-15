@@ -39,10 +39,14 @@ if [ "$found_ip" = false ]; then
     echo "Timed out waiting for IP address allocation." && exit 1
 fi
 
-echo "Updating DNS record ${AKS_CLUSTER_NAME}.sttlab.eu with A record pointing to ${ip}"
-echo "Gandi URL: https://api.gandi.net/v5/livedns/domains/sttlab.eu/records/${AKS_CLUSTER_NAME}/A"
-echo "Gandi payload: " '{"rrset_name": "'${AKS_CLUSTER_NAME}'","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["'${ip}'"]}'
-curl -s -X PUT -H "Content-Type: application/json" \
-     -H "Authorization: Bearer ${GANDI_PAT_TOKEN}" \
-     -d '{"rrset_name": "'${AKS_CLUSTER_NAME}'","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["'${ip}'"]}' \
-     https://api.gandi.net/v5/livedns/domains/sttlab.eu/records/${AKS_CLUSTER_NAME}/A || exit 1
+if [ -n "${GANDI_PAT_TOKEN}" ] && [ -n "${AKS_DOMAIN_NAME}" ]; then
+  echo "Updating DNS record ${AKS_CLUSTER_NAME}.sttlab.eu with A record pointing to ${ip}"
+  echo "Gandi URL: https://api.gandi.net/v5/livedns/domains/sttlab.eu/records/${AKS_CLUSTER_NAME}/A"
+  echo "Gandi payload: " '{"rrset_name": "'${AKS_CLUSTER_NAME}'","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["'${ip}'"]}'
+  curl -s -X PUT -H "Content-Type: application/json" \
+      -H "Authorization: Bearer ${GANDI_PAT_TOKEN}" \
+      -d '{"rrset_name": "'${AKS_CLUSTER_NAME}'","rrset_type": "A","rrset_ttl": 300,"rrset_values": ["'${ip}'"]}' \
+      https://api.gandi.net/v5/livedns/domains/${AKS_DOMAIN_NAME}/records/${AKS_CLUSTER_NAME}/A || exit 1
+fi
+
+
