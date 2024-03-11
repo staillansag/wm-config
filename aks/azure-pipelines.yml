@@ -6,7 +6,7 @@ pool:
 
 variables:
   - group: aks.variables
-  - group: azure.variables
+  - group: azure.acg.variables
   - group: sag.variables
   - group: environment.variables
 
