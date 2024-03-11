@@ -6,6 +6,10 @@ kubectl create configmap environment-config \
 	--from-literal=RDS_SERVER_NAME=${RDS_SERVER_NAME} \
 	--from-literal=RDS_PORT=${RDS_PORT} \
 	--from-literal=RDS_USER_NAME=${RDS_USER_NAME} \
+	--from-literal=POSTGRES_DATABASE_NAME=${POSTGRES_DATABASE_NAME} \
+	--from-literal=POSTGRES_SERVER_NAME=${POSTGRES_SERVER_NAME} \
+	--from-literal=POSTGRES_PORT=${POSTGRES_PORT} \
+	--from-literal=POSTGRES_USERNAME=${POSTGRES_USERNAME} \
 	--from-literal=S3_BUCKET_NAME=${S3_BUCKET_NAME} \
 	--from-literal=S3_FOLDER=${S3_FOLDER} \
 	--from-literal=S3_REGION=${S3_REGION} \
