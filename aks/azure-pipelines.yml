@@ -2,7 +2,7 @@
 trigger: none
 
 pool:
-  name: Default
+  name: local
 
 variables:
   - group: aks.variables
