@@ -43,11 +43,11 @@ steps:
   inputs:
     secureFile: 'mcgw-license.xml'
 
-- script: |
-    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-    chmod 700 get_helm.sh
-    ./get_helm.sh
-  displayName: 'Install helm'
+#- script: |
+#    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+#    chmod 700 get_helm.sh
+#    ./get_helm.sh
+#  displayName: 'Install helm'
 
 - script: chmod u+x ./aks/*.sh
   displayName: "Grant shell execution permissions"
